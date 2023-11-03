@@ -1,0 +1,94 @@
+monorepo
+
+lerna: 
+	npm i lerna -g
+
+	lerna init
+		lerna.json
+
+		my-lerna-repo/
+		  package.json
+		  packages/
+		    package-1/
+		      package.json
+		    package-2/
+		      package.json
+
+	lerna create <name> [loc] // 创建一个包，name包名，loc 位置可选
+	lerna list // 查看包
+
+	lerna bootstrap
+	lerna add A --scope=B // 给A添加以依赖B
+	lerna bootstarp // 这条命令会给所有的package安装依赖
+	lerna bootstrap --scope=package // 安装某个依赖包
+	lerna bootstrap --hoist axios // 提升公共包到根目录
+	lerna clean // 删除所有依赖
+	lerna clean --scope=package //删除某个包的依赖
+
+	lerna run build // 所有包都会执行打包命令
+	lerna run start --scope=package // 运行某个包中的script命令
+
+	lerna publish // 发布版本 publish
+	lerna version --force-publish // 忽略修改强制生成版本
+
+
+	["packages/*", "src/**"] 匹配这个树结构：
+		packages/
+			...
+		src/
+			...
+
+
+npm workspace
+	设置package.json文件:
+	{
+	  "name": "workspace-example",
+	  "private": true,
+	  "workspaces": [
+	    "packages/*"
+	  ],
+	  "devDependencies": {
+	    "cross-env": "^5.2.0"
+	  }
+	}
+
+	创建子模块:
+		mkdir packages/module1
+		mkdir packages/module2
+	安装所有子模块的依赖:
+		npm install
+	运行所有子模块的命令:
+		npm run [command]
+	运行单个子模块中的命令:
+		npm run [command] --workspaces=module1
+
+npm link
+	不同目录下使用：
+		cd ~/projects/some-dep 
+		npm link # 步骤 1. 为依赖项创建全局软链npm link。一个符号链接，简称软链，是一个快捷方式，指向系统上的其它目录或文件。
+		cd ~/projects/my-app 
+		npm link some-dep # 步骤 2.告诉应用程序使用全局软链npm link some-dep。
+	同一目录下的使用:
+		cd xxx/project1  // 进入应用文件夹
+		npm link ../module1  // 软链接
+	将依赖连接到子模块中:
+		cd packages/module2
+		npm link lodash
+	删除npm link的链接: 
+		cd xxx/project1
+		npm unlink module1 // 删除npm link的链接
+	解除模块的全局链接:
+		cd xxx/module1
+		pm unlink module1
+
+	ln -s /path/to/external/repo external-package
+
+
+
+
+
+
+
+
+
+
