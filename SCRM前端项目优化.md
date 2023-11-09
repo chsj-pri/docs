@@ -54,6 +54,20 @@
 	尽可能通用化，而不是依赖于三方组件封装
 
 
+	https://zhuanlan.zhihu.com/p/535794303?utm_id=0
+	https://zhuanlan.zhihu.com/p/643214308
+
+
+	Yup、Zod、Superstruct、Joi、Vest、class-validator、io-ts、nope
+
+
+	https://github.com/react-hook-form/react-hook-form
+
+	https://www.zhihu.com/question/338082919/answer/3220324040?utm_id=0
+	https://zeroing.jd.com/docs.html#/
+	MicroApp
+
+
 
 
 
