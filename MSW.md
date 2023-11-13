@@ -1179,7 +1179,7 @@ server.events.on("response:mocked", ({ request, requestId, response }) => {
 当发送原始（绕过的）响应时，会触发 response:bypass 事件
 与 response:mocked 事件类似，您可以在监听器中访问响应和请求引用
 
-### 最佳实践-处理程序结构
+### 处理程序结构
 
 我们建议利用一个单独的 handlers.js 模块来描述网络的成功状态（正常情况）
 始终从成功行为开始，您始终有一个基本的请求处理，以及您可能添加的任何运行时覆盖。
@@ -1244,6 +1244,550 @@ export const handlers = [
   http.post("/checkout/:cartId", withAuth(addToCartResolver)),
 ];
 ```
+
+### 网络行为覆盖
+
+使用专用的.use() API 覆盖任何特定网络行为
+**永久覆盖**
+
+```js
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
+const server = setupServer(
+  http.get("/resource", () => {
+    return HttpResponse.text("Fallback");
+  })
+);
+server.use(
+  http.get("/resource", () => {
+    return HttpResponse.text("Override");
+  })
+);
+```
+
+**一次性覆盖**
+
+```js
+const server = setupServer(
+  http.get("/resource", () => {
+    return HttpResponse.text("Fallback");
+  })
+);
+
+server.use(
+  http.get(
+    "/resource",
+    () => {
+      return HttpResponse.text("One-time override");
+    },
+    { once: true }
+  )
+);
+```
+
+### 自定义请求谓词
+
+**查询参数谓词**
+
+```js
+// withSearchParams.js
+import { passthrough } from "msw";
+
+export function withSearchParams(predicate, resolver) {
+  return (...args) => {
+    const { request } = args;
+    const url = new URL(request.url);
+
+    if (!predicate(url.searchParams)) {
+      return passthrough();
+    }
+
+    return resolver(...args);
+  };
+}
+```
+
+```js
+// handlers.js
+import { http, HttpResponse } from "msw";
+import { withSearchParams } from "./withSearchParams";
+
+export const handlers = [
+  http.get(
+    "/user",
+    withSearchParams(
+      // 仅匹配具有 "userId" 查询参数的 "GET /user" 请求。
+      (params) => params.has("userId"),
+      ({ request, params, cookies }) => {
+        return HttpResponse.json({
+          name: "John Maverick",
+        });
+      }
+    )
+  ),
+];
+```
+
+**请求体谓词**
+
+```js
+// withJsonBody.js
+import isEqual from "lodash.isequal";
+
+export function withJsonBody(expectedBody, resolver) {
+  return async (...args) => {
+    const { request } = args;
+
+    // 忽略具有非JSON主体的请求。
+    const contentType = request.headers.get("Content-Type") || "";
+    if (!contentType.includes("application/json")) {
+      return;
+    }
+
+    // 克隆请求并将其读取为JSON。
+    const actualBody = await request.clone().json();
+
+    // 使用 "lodash" 比较两个对象。
+    if (!isEqual(actualBody, expectedBody)) {
+      return;
+    }
+
+    return resolver(...args);
+  };
+}
+```
+
+```js
+// withJsonBody.js
+import isEqual from "lodash.isequal";
+export function withJsonBody(expectedBody, resolver) {
+  return async (...args) => {
+    const { request } = args;
+    // 忽略具有非JSON主体的请求。
+    const contentType = request.headers.get("Content-Type") || "";
+    if (!contentType.includes("application/json")) {
+      return;
+    }
+
+    // 克隆请求并将其读取为JSON。
+    const actualBody = await request.clone().json();
+    // 使用 "lodash" 比较两个对象。
+    if (!isEqual(actualBody, expectedBody)) {
+      return;
+    }
+
+    return resolver(...args);
+  };
+}
+```
+
+```js
+// withJsonBody.js
+http.post(
+  "/user",
+  // 仅匹配具有主体 "id" 属性等于 "abc-123" 的 "POST /user" 请求。
+  withJsonBody(
+    {
+      id: "abc-123",
+    },
+    ({ request, params, cookies }) => {
+      return HttpResponse.json({}, { status: 201 });
+    }
+  )
+);
+```
+
+**高级**
+更高级的场景请考虑实现自定义请求处理程序（RequestHandler 类）
+
+### 动态模拟场景
+
+声明一组场景，并根据某些运行时条件有条件地应用它们
+
+```js
+// mocks/scenarios.js
+import { http, HttpResponse } from "msw";
+export const scenarios = {
+  success: [
+    http.get("/user", () => {
+      return HttpResponse.json({ name: "John Maverick" });
+    }),
+  ],
+  error: [
+    http.get("/user", () => {
+      return new HttpResponse(null, { status: 500 });
+    }),
+  ],
+};
+```
+
+```js
+// mocks/browser.js
+import { handlers } from "./handlers";
+import { scenarios } from "./scenarios";
+// 由于 worker 在客户端注册，您可以在分配请求处理程序之前读取页面的查询参数。
+const scenarioName = new URLSearchParams(window.location.search).get(
+  "scenario"
+);
+const runtimeScenarios = scenarios[scenarioName] || [];
+const worker = setupWorker(...runtimeScenarios, ...handlers);
+```
+
+### 处理请求和响应的 Cookies
+
+**读取请求 Cookies**
+
+```js
+import { http, HttpResponse } from "msw";
+export const handlers = [
+  http.get("/api/user", ({ cookies }) => {
+    if (!cookies.authToken) {
+      return new HttpResponse(null, { status: 403 });
+    }
+
+    return HttpResponse.json({ name: "John" });
+  }),
+];
+```
+
+**模拟响应 Cookies**
+
+```js
+import { http, HttpResponse } from "msw";
+export const handlers = [
+  http.post("/login", () => {
+    return new HttpResponse(null, {
+      headers: {
+        // 设置 "Set-Cookie" 模拟响应标头
+        // 将这些 Cookies 转发到 "document"，就好像它们是从服务器发送的一样。
+        "Set-Cookie": "authToken=abc-123",
+      },
+    });
+  }),
+];
+```
+
+### 读取和写入请求的查询参数
+
+要读取拦截的请求的 URL 查询参数，首先将 request.url 字符串构造为 URL 实例
+URL 实例为您提供了可以用于读取查询参数的 URLSearchParams
+
+查询参数和路径参数区别：
+
+- 查询参数：?a=1&b=2
+- 路径参数：GET /user/:id，其中 id 是路径参数
+
+**读取单个参数**
+
+```js
+export const handlers = [
+  http.get("/product", ({ request }) => {
+    // 构造一个 URL 实例，使用拦截的请求。
+    const url = new URL(request.url);
+    // 使用 "URLSearchParams" API 读取 "id" URL 查询参数
+    // 对于 "/product?id=1"，"productId" 将等于 "1"。
+    const productId = url.searchParams.get("id");
+    // 请注意，查询参数可能为 undefined。
+    // 请确保在处理程序中考虑到这一点。
+    if (!productId) {
+      return new HttpResponse(null, { status: 404 });
+    }
+    return HttpResponse.json({ productId });
+  }),
+];
+```
+
+**读取多值参数**
+
+```js
+export const handlers = [
+  http.get("/products", ({ request }) => {
+    const url = new URL(request.url);
+    // 对于 "/products?id=1&id=2&id=3"，
+    // "productIds" 将等于 ["1", "2", "3"]。
+    const productIds = url.searchParams.getAll("id");
+
+    return HttpResponse.json({ productIds });
+  }),
+];
+```
+
+**写入查询参数**
+
+```js
+export const handlers = [
+  http.get("/user", ({ request }) => {
+    const url = new URL(request.url);
+    url.searchParams.set("debug", "true");
+    // 根据拦截的请求构造代理请求
+    // 但提供一个包含修改后查询参数的新 URL。
+    const proxyRequest = new Request(url, request);
+  }),
+];
+```
+
+### 响应修补
+
+将模拟响应与实际响应结合起来的技术
+**bypass**
+
+```js
+import { http, bypass, HttpResponse } from "msw";
+export const handlers = [
+  http.get("https://api.github.com/user/:username", async ({ request }) => {
+    // 从 GitHub API 获取原始响应
+    const gitHubUser = await bypass(request).then((response) =>
+      response.json()
+    );
+    // 以结合实际和模拟数据的方式响应
+    return HttpResponse.json({
+      id: gitHubUser.id,
+      login: gitHubUser.login,
+      location: "London",
+    });
+  }),
+];
+```
+
+**代理请求**
+
+```js
+import { http, bypass } from "msw";
+
+export const handlers = [
+  http.get("/resource", async ({ request }) => {
+    const originalUrl = new URL(request.url);
+    const proxyUrl = new URL("/proxy", location.origin);
+    // 构造一个代理请求。
+    const proxyRequest = new Request(proxyUrl, {
+      headers: {
+        "Content-Type": request.headers.get("Content-Type"),
+        "X-Proxy-Header": "true",
+      },
+    });
+    // 执行代理请求。
+    const originalResponse = await bypass(proxyRequest);
+    // 返回模拟响应...
+  }),
+];
+```
+
+### 使用生成器函数
+
+```js
+import { http, HttpResponse, delay } from "msw";
+
+export const handlers = [
+  http.get("/weather/:city", async function* () {
+    const degree = 25;
+    // 添加随机的服务器端延迟以模拟
+    // 真实世界中的服务器。
+    await delay();
+
+    while (degree < 27) {
+      degree++;
+      yield HttpResponse.json({ degree: degree });
+    }
+
+    return HttpResponse.json({ degree: degree });
+  }),
+];
+```
+
+```bash
+GET /weather/london // { "degree": 26 }
+GET /weather/london // { "degree": 27 }
+GET /weather/london // { "degree": 28 }
+// 所有后续请求将响应
+// 最新的返回响应。
+GET /weather/london // { "degree": 28 }
+```
+
+### 流
+
+**ReadableStream**
+
+```js
+import { http, HttpResponse } from "msw";
+
+const encoder = new TextEncoder();
+export const handlers = [
+  http.get("/video", () => {
+    const stream = new ReadableStream({
+      start(controller) {
+        // 使用 "TextEncoder" 编码字符串块。
+        controller.enqueue(encoder.encode("Brand"));
+        controller.enqueue(encoder.encode("New"));
+        controller.enqueue(encoder.encode("World"));
+        controller.close();
+      },
+    });
+
+    // 立即发送模拟响应。
+    return new HttpResponse(stream, {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
+  }),
+];
+```
+
+**TransformStream**
+
+```js
+import { http, HttpResponse, delay } from "msw";
+export const handlers = [
+  http.get("/video", async () => {
+    // 请求原始视频流。
+    const videoResponse = await fetch(
+      "https://nickdesaulniers.github.io/netfix/demo/frag_bunny.mp4"
+    );
+    const videoStream = videoResponse.body;
+
+    // 实现一个自定义转换流
+    // 该流接受任何流并在其块之间插入随机延迟。
+    const latencyStream = new TransformStream({
+      start() {},
+      async transform(chunk, controller) {
+        await delay();
+        controller.enqueue(chunk);
+      },
+    });
+
+    return new HttpResponse(
+      // 通过延迟转换流传递的原始视频流进行响应。
+      videoStream.pipeThrough(latencyStream),
+      // 继承原始视频的其余响应数据，如 "headers"。
+      videoResponse
+    );
+  }),
+];
+```
+
+### 网络错误
+
+```js
+import { http, HttpResponse } from "msw";
+export const handlers = [
+  http.get("/resource", () => {
+    // 响应网络错误
+    return HttpResponse.error();
+  }),
+];
+```
+
+### 响应二进制数据
+
+```js
+import { http, HttpResponse } from "msw";
+export const handlers = [
+  http.get("/images/:imageId", async ({ params }) => {
+    // 在浏览器中获取缓冲区的最简单方法
+    // 是获取所需的资源并将其主体读取为 "response.arrayBuffer()"。
+    const buffer = await fetch(`/static/images/${params.imageId}`).then(
+      (response) => response.arrayBuffer()
+    );
+
+    // 使用 "HttpResponse.arrayBuffer()" 快捷方法
+    // 来自动推断响应主体缓冲区的长度。
+    return HttpResponse.arrayBuffer(buffer, {
+      headers: {
+        "Content-Type": "image/jpeg",
+      },
+    });
+  }),
+];
+```
+
+### 自定义工作线程脚本位置
+
+默认情况下，调用 worker.start() 将注册位于 /mockServiceWorker.js 的 Service Worker 脚本
+自定义工作线程脚本的位置：
+
+```js
+await worker.start({
+  serviceWorker: {
+    // 如果您的应用程序遵循严格的目录结构，则这是有用的。
+    url: "/assets/mockServiceWorker.js",
+  },
+});
+```
+
+> 更改工作线程脚本的位置会影响 Service Worker 拦截请求的范围
+> 例如，从 /assets/ 目录提供工作线程脚本意味着只有在 /assets/ 路径及其子路径下提供的页面才能受到工作线程（即 MSW）的影响
+
+通过在响应请求的工作线程脚本中发送 Service-Worker-Allowed 头告诉浏览器忽略默认的工作线程范围限制
+
+```js
+app.get("/assets/mockServiceWorker.js", (req, res, next) => {
+  // 允许工作线程控制应用程序的所有页面。
+  res.setHeader("Service-Worker-Allowed", "/");
+  next();
+});
+```
+
+### 高阶响应解析器
+
+```js
+// mocks/middleware.js
+import { HttpResponse } from "msw";
+// 一个高阶响应解析器，它在进行实际的响应解析之前验证请求的授权标头。
+export function withAuth(resolver) {
+  return (input) => {
+    const { request } = input;
+    if (!request.headers.get("Authorization")) {
+      return new HttpResponse(null, { status: 401 });
+    }
+
+    return resolver(input);
+  };
+}
+```
+
+```js
+// mocks/handlers.js
+import { http, HttpResponse } from 'msw'
+import { withAuth } from './middleware'
+export const handlers = [
+  // 使用 "withAuth" 高阶响应解析器
+  // 将要求发送到 "POST /comment" 的出站请求
+  // 在返回模拟的 JSON 响应之前设置 "Authorization" 标头。
+  http.post('/comment', withAuth(({ request }) => {
+    const { author, text } = await request.json()
+    return HttpResponse.json({ author, text }, { status: 201 })
+  }))
+]
+```
+
+### 保持模拟与实际后端同步
+
+**使用规范**
+建议依赖于一个规范文件，后端和前端都可以将其视为事实的来源
+
+**OpenAPI**
+考虑使用 msw-auto-mock 包从中生成请求处理程序
+
+**网络快照**
+导出 har 文件，使用社区 msw-webarchive 包
+
+```js
+// mocks/browser.js
+import { setupWorker } from "msw";
+import { setRequestHandlersByWebarchive } from "@tapico/webarchive";
+import * as snapshot from "./snapshot.har";
+export const worker = setupWorker();
+// 从给定的网络快照生成的请求处理程序来增强 worker
+setRequestHandlersByWebarchive(worker, snapshot);
+```
+
+### 使用 Local HTTPS
+
+- 打开 chrome://flags
+- 搜索 allow-insecure-localhost
+- 选择“已启用”选项
+- 如果遇到证书获取/验证问题，请将 ignore-certificate-errors 标志设置为“已启用”
+- 如果遇到不安全的源问题，请将 unsafely-treat-insecure-origin-as-secure 标志设置为 https://localhost
 
 ### 参考
 

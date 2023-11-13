@@ -67,20 +67,23 @@
 	https://zeroing.jd.com/docs.html#/
 	MicroApp
 
+	umijs
+	unocss
+	iconify
+	Immer
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.
+└── src
+    ├── assets # 通用静态文件
+    ├── components # 通用基础组件
+    ├── config # 项目环境变量
+    ├── features # 项目特性功能
+    │   ├── {feature1}
+    │   └── {feature2}
+    ├── hooks # 通用基础 React hooks
+    ├── models # 通用基础 model
+    ├── pages # 项目路由文件夹
+    ├── services # 项目接口请求（一般使用自动化工具生成）
+    ├── types #全局类型文件
+    └── utils #通用基础工具函数
 

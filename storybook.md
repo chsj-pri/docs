@@ -420,7 +420,7 @@ export default {
 };
 ```
 
-故事parameters
+### 故事parameters
 ```jsx
 import { Button } from './Button';
 
@@ -445,7 +445,7 @@ export const Primary = {
 };
 ```
 
-组件parameters
+### 组件parameters
 ```jsx
 import { Button } from './Button';
 
@@ -463,7 +463,7 @@ export default {
 };
 ```
 
-全局parameters
+### 全局parameters
 ```jsx
 // .storybook/preview.js
 
