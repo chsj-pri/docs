@@ -1,6 +1,6 @@
 ### 安装、启动
-npx storybook@latest init
-npm run storybook
+- npx storybook@latest init
+- npm run storybook
 
 ### 介绍
 ```jsx
