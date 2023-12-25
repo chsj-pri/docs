@@ -1,4 +1,74 @@
-学习 Python 是一个很好的选择，因为它是一门简单易学且功能强大的编程语言。下面是一个从入门到精通的学习指南，帮助你系统地学习 Python。
+## 库
+
+- requests
+- scrapy
+- wxPython
+- BeautifulSoup
+- NumPy
+- pandas
+- PyTorch
+- Flask
+- fastapi
+
+## 参考
+
+- https://docs.python.org/zh-cn/3/
+- https://www.numpy.org.cn/
+- https://www.pypandas.cn/
+- https://moviepy-cn.readthedocs.io/zh/latest/
+- https://github.com/china-testing/python_cn_resouce/blob/main/fastapi.md
+- https://docs.python.org/zh-cn/3/library/
+- https://fastapi.tiangolo.com/zh/tutorial/
+- https://github.com/AUTOMATIC1111/stable-diffusion-webui
+- https://github.com/CompVis/stable-diffusion
+- https://github.com/OpenTalker/SadTalker
+- https://github.com/OpenTalker/video-retalking
+
+## 包管理
+
+### Poetry
+
+#### 安装 Poetry
+
+- curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+- pip install --user poetry
+- poetry --version
+
+#### 基本用法
+
+```bash
+poetry init                 # 在已有的项目里使用，创建pyproject.toml文件
+poetry new foo              # 创建新项目，foo文件夹
+poetry install              # 创建虚拟环境，安装依赖，--no-dev选项不安装开发依赖
+poetry shell                # 激活虚拟环境并执行命令
+poetry run python app.py    # 显式激活虚拟环境
+poetry add flask            # 安装依赖包
+poetry add pytest --dev     # 安装开发依赖
+poetry show                 # 查看所有安装的依赖
+poetry show --tree          # 查看依赖关系
+poetry show --outdated      # 查看可更新依赖
+poetry update               # 更新所有锁定版本依赖
+poetry update foo           # 更新某个指定的依赖
+poetry remove foo           # 卸载包
+poetry build                # 打包项目
+poetry publish              # 发布项目
+```
+
+#### 常用配置
+```bash
+poetry config http-basic.pypi username password         # 写入PyPI账号密码信息
+poetry config settings.virtualenvs.in-project true      # 设置在项目内创建虚拟环境文件夹
+```
+
+#### 设置PyPI镜像源
+```toml
+# pyproject.toml
+[[tool.poetry.source]]
+name = "douban"
+url = "https://pypi.doubanio.com/simple/"
+```
+
+## 开发指南
 
 ### 入门阶段：
 

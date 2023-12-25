@@ -1,3 +1,6 @@
+# 参考
+- https://jesse205.github.io/MagiskChineseDocument/
+
 # BusyBox
 
 Magisk 随附一个功能完备的 BusyBox 二进制文件（包括完整的 SELinux 支持）。可执行文件位于`/data/adb/magisk/busybox`。Magisk 的 BusyBox 支持运行时可切换的“ASH Standalone Shell Mode”。独立模式的含义是，在 BusyBox 的 ash shell 中运行时，每个命令都将直接使用 BusyBox 内的 applet，而不管设置为 PATH 是什么。例如，诸如 ls、rm、chmod 等命令将不使用 PATH 中设置的内容（在 Android 的情况下，默认情况下分别为/system/bin/ls、/system/bin/rm 和/system/bin/chmod），而是直接调用内部 BusyBox applet。这确保脚本始终在可预测的环境中运行，并始终具有完整的命令套件，无论其运行在哪个 Android 版本上。要强制命令不使用 BusyBox，必须使用完整路径调用可执行文件。
@@ -273,12 +276,12 @@ ramdisk
 │ │ └── random.png <--- 此文件将替换/res/random.png
 │
 
-└── new_file <--- 此文件将被忽略，因为
+└── new*file <--- 此文件将被忽略，因为
 │ /new_file 不存在
 ├── res
 │ └── random.png <--- 此文件将被/overlay.d/res/random.png 替换
 ├── ...
-├── ... /_ 剩余的 initramfs 文件 _/
+├── ... /* 剩余的 initramfs 文件 \_/
 │
 ```
 
@@ -295,3 +298,141 @@ start myservice
 service myservice ${MAGISKTMP}/myscript.sh
 oneshot
 ```
+
+# magisk 底层技术原理
+
+Magisk 的底层技术原理可以分为两部分：
+
+- **Systemless Root:** Magisk 通过一种特殊的机制来修改系统，这种机制不会对系统文件造成任何修改。具体来说，Magisk 会在启动时修改 init 进程，将 init 进程的入口点重定向到 Magisk 的 init 模块。Magisk 的 init 模块会在启动时加载 Magisk 的核心模块，并将这些模块注入到系统的关键位置。
+
+- **模块管理:** Magisk 提供了一个模块管理器，允许用户安装和管理第三方模块。模块可以用来添加新功能或修改系统行为。Magisk 的模块管理器采用了一种特殊的机制来加载模块，这种机制不会对系统文件造成任何修改。具体来说，Magisk 会在启动时加载 Magisk 的模块管理器，模块管理器会在启动时加载用户安装的模块。
+
+**Systemless Root**
+
+Magisk 的 Systemless Root 机制主要包括以下步骤：
+
+1. 在启动时，Magisk 会修改 init 进程，将 init 进程的入口点重定向到 Magisk 的 init 模块。
+2. Magisk 的 init 模块会在启动时加载 Magisk 的核心模块。
+3. Magisk 的核心模块会将以下模块注入到系统的关键位置：
+   - **Magisk Hide:** 用于隐藏 Root 状态，使不支持 Root 的应用程序可以正常运行。
+   - **MagiskSU:** 用于提供 Root 权限，允许用户执行 Root 操作。
+   - **Magisk Modules:** 用于加载第三方模块。
+
+**模块管理**
+
+Magisk 的模块管理机制主要包括以下步骤：
+
+1. 用户使用 Magisk 的模块管理器安装第三方模块。
+2. Magisk 的模块管理器会在启动时加载用户安装的模块。
+3. Magisk 的模块会在启动时将自己注入到系统的关键位置。
+
+**安全性**
+
+Magisk 采用了多种安全措施来保护系统安全，包括：
+
+- **SELinux 补丁：**Magisk 会在启动时为 SELinux 添加一个新的模块，该模块会允许 Magisk 的模块绕过 SELinux 的安全检查。
+- **启动时认证/dm-verity/强制加密移除：**Magisk 可以移除启动时认证、dm-verity 和强制加密等安全功能，以便用户可以自由修改系统。
+- **模块签名验证：**Magisk 会对第三方模块进行签名验证，以防止恶意模块被安装。
+
+**与其他 Root 工具的区别**
+
+Magisk 与其他 Root 工具的主要区别在于，Magisk 采用了 Systemless Root 机制，不会对系统文件造成任何修改。因此，Magisk 可以与大多数 Android 应用程序兼容，包括那些不支持 Root 的应用程序。
+
+此外，Magisk 还提供了模块管理功能，允许用户安装和管理第三方模块。模块可以用来添加新功能或修改系统行为。
+
+## init 进程
+
+init 进程是 Linux 系统启动时启动的第一个用户进程，它负责启动和停止系统上的所有其他进程。init 进程始终分配的进程 ID (PID) 为 1，通俗地说，当你按下电源按钮时，你的系统将首先寻找引导加载程序（ Linux grub），然后它会尝试启动内核。但内核本身无法启动所有进程，因此它将启动第一个（或父）进程，称为 init（“初始化”的意思），PID 为“ 1 ”（进程标识符按顺序分配）。
+
+init 进程的具体任务包括：
+
+- 加载系统配置文件，例如 /etc/inittab 和 /etc/rc.local。
+- 启动系统守护进程，例如 getty、syslogd、crond 等。
+- 启动用户进程，例如 shell、应用程序等。
+
+init 进程的启动流程如下：
+
+1. 内核启动完成后，会启动 init 进程。
+2. init 进程会加载系统配置文件，并根据配置文件启动系统守护进程。
+3. 系统守护进程会启动用户进程。
+
+init 进程是 Linux 系统中最重要的进程之一，它负责整个系统的启动和运行。
+
+以下是 init 进程的一些常用命令：
+
+- **init:** 启动 init 进程。
+- **init 0:** 关闭系统。
+- **init 6:** 重启系统。
+- **init q:** 进入单用户模式。
+
+在 Android 系统中，init 进程是由 init.rc 文件来配置的。init.rc 文件是一个 shell 脚本，它包含了 init 进程需要执行的所有命令。
+
+## 将 init 进程的入口点重定向到 Magisk 的 init 模块
+
+Magisk 将 init 进程的入口点重定向到 Magisk 的 init 模块，是通过修改 init.rc 文件来实现的。
+
+init.rc 文件是一个 shell 脚本，它包含了 init 进程需要执行的所有命令。Magisk 会在 init.rc 文件中添加以下命令：
+
+```
+on init
+    # 将 init 进程的入口点重定向到 Magisk 的 init 模块
+    setprop init_target /system/bin/magiskinit
+```
+
+该命令会将 init_target 变量的值设置为 /system/bin/magiskinit。init 进程在启动时会读取 init.rc 文件，并根据 init_target 变量的值来确定自己的入口点。因此，当 init_target 变量的值设置为 /system/bin/magiskinit 时，init 进程的入口点就会被重定向到 Magisk 的 init 模块。
+
+Magisk 的 init 模块会在启动时加载 Magisk 的核心模块。Magisk 的核心模块会将 Magisk 的其他模块注入到系统的关键位置。因此，通过将 init 进程的入口点重定向到 Magisk 的 init 模块，Magisk 就可以实现 Systemless Root。
+
+具体来说，Magisk 的 init 模块会在启动时执行以下步骤：
+
+1. 加载 Magisk 的核心模块。
+2. 将 Magisk 的其他模块注入到系统的关键位置。
+3. 启动系统守护进程和用户进程。
+
+通过这些步骤，Magisk 就可以在系统启动时完成 Root 操作，而不会对系统文件造成任何修改。
+
+## 具体步骤
+
+从设备加电到 magiskinit 进程启动完成，具体经过了以下步骤：
+
+1. 设备加电后，会启动引导加载程序。引导加载程序会加载内核。
+2. 内核启动完成后，会启动 init 进程。init 进程是 Linux 系统启动时启动的第一个用户进程，它负责启动和停止系统上的所有其他进程。
+3. init 进程会读取 init.rc 文件，并根据 init_target 变量的值来确定自己的入口点。当 init_target 变量的值设置为 /system/bin/magiskinit 时，init 进程的入口点就会被重定向到 Magisk 的 init 模块。
+4. Magisk 的 init 模块会在启动时加载 Magisk 的核心模块。Magisk 的核心模块会将 Magisk 的其他模块注入到系统的关键位置。
+5. Magisk 的其他模块会在启动时执行以下步骤：
+   - **Magisk Hide：**用于隐藏 Root 状态，使不支持 Root 的应用程序可以正常运行。
+   - **MagiskSU：**用于提供 Root 权限，允许用户执行 Root 操作。
+   - **Magisk Modules：**用于加载第三方模块。
+6. Magisk 的 init 模块会启动系统守护进程和用户进程。
+
+具体来说，从设备加电到 magiskinit 进程启动完成，可以分为以下几个阶段：
+
+**阶段 1：引导加载程序启动**
+
+设备加电后，会启动引导加载程序。引导加载程序是负责启动操作系统的软件。引导加载程序会加载内核，并将控制权交给内核。
+
+**阶段 2：内核启动**
+
+内核是操作系统的核心部分。内核负责管理硬件资源，并为应用程序提供运行环境。内核启动完成后，会启动 init 进程。
+
+**阶段 3：init 进程启动**
+
+init 进程是 Linux 系统启动时启动的第一个用户进程。init 进程负责启动和停止系统上的所有其他进程。init 进程会读取 init.rc 文件，并根据 init_target 变量的值来确定自己的入口点。当 init_target 变量的值设置为 /system/bin/magiskinit 时，init 进程的入口点就会被重定向到 Magisk 的 init 模块。
+
+**阶段 4：magiskinit 模块启动**
+
+Magisk 的 init 模块会在启动时加载 Magisk 的核心模块。Magisk 的核心模块会将 Magisk 的其他模块注入到系统的关键位置。
+
+**阶段 5：Magisk 模块启动**
+
+Magisk 的其他模块会在启动时执行以下步骤：
+
+    * **Magisk Hide：**用于隐藏 Root 状态，使不支持 Root 的应用程序可以正常运行。
+    * **MagiskSU：**用于提供 Root 权限，允许用户执行 Root 操作。
+    * **Magisk Modules：**用于加载第三方模块。
+
+**阶段 6：系统守护进程和用户进程启动**
+
+Magisk 的 init 模块会启动系统守护进程和用户进程。系统守护进程负责维护系统的运行，用户进程则是用户可以直接使用的应用程序。
+
+通过以上步骤，magiskinit 进程就可以启动完成，并完成 Root 操作。
