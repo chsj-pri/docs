@@ -23,6 +23,15 @@
 - https://github.com/CompVis/stable-diffusion
 - https://github.com/OpenTalker/SadTalker
 - https://github.com/OpenTalker/video-retalking
+- https://github.com/jina-ai/jina
+- https://github.com/Evil0ctal/Douyin_TikTok_Download_API
+- https://github.com/fastapi-admin/fastapi-admin
+- https://github.com/paulpierre/RasaGPT
+- https://github.com/chatchat-space/Langchain-Chatchat
+- https://github.com/yzfly/awesome-chatgpt-zh
+- https://17yongai.com/
+- https://github.com/bleedline/aimoneyhunter
+- https://liaokong.gitbook.io/llm-kai-fa-jiao-cheng/#chain-lian
 
 ## 包管理
 
