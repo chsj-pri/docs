@@ -17,6 +17,14 @@
 - uvicorn
 - dotenv
 
+```
+uvicorn = "^0.24.0.post1"
+websockets = "^12.0"
+openai = "^1.2.4"
+python-dotenv = "^1.0.0"
+beautifulsoup4 = "^4.12.2"
+httpx = "^0.25.1"
+```
 
 ![Alt text](images/image.png)
 
