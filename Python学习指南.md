@@ -1,18 +1,17 @@
 ## 库
 
 - requests
+- httpx
 - scrapy
 - wxPython
 - BeautifulSoup
 - NumPy
 - pandas
 - PyTorch
-- Flask
 - fastapi
 - jinja2
 - sqlalchemy
 - Matplotlib
-- numpy
 - scipy
 - pytest
 - uvicorn
