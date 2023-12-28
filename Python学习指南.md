@@ -50,6 +50,8 @@ httpx = "^0.25.1"
 - https://17yongai.com/
 - https://github.com/bleedline/aimoneyhunter
 - https://liaokong.gitbook.io/llm-kai-fa-jiao-cheng/#chain-lian
+- https://zhuanlan.zhihu.com/p/629185975
+- https://zhuanlan.zhihu.com/p/641384348
 - https://zhuanlan.zhihu.com/p/27400862
 - https://zhuanlan.zhihu.com/p/387078089
 - https://zhuanlan.zhihu.com/p/665396121
