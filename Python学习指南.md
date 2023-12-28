@@ -58,6 +58,8 @@ httpx = "^0.25.1"
 - https://zhuanlan.zhihu.com/p/657950165
 - https://zhuanlan.zhihu.com/p/636577476
 - https://segmentfault.com/a/1190000018002480
+- https://python.langchain.com/docs/get_started/introduction
+- https://www.zhihu.com/people/cfyfuz/posts?page=5
 
 
 ## 包管理
