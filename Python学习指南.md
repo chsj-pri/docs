@@ -9,6 +9,17 @@
 - PyTorch
 - Flask
 - fastapi
+- jinja2
+- sqlalchemy
+- Matplotlib
+- numpy
+- scipy
+- pytest
+- uvicorn
+- dotenv
+
+
+![Alt text](images/image.png)
 
 ## 参考
 
@@ -32,6 +43,13 @@
 - https://17yongai.com/
 - https://github.com/bleedline/aimoneyhunter
 - https://liaokong.gitbook.io/llm-kai-fa-jiao-cheng/#chain-lian
+- https://zhuanlan.zhihu.com/p/27400862
+- https://zhuanlan.zhihu.com/p/387078089
+- https://zhuanlan.zhihu.com/p/665396121
+- https://zhuanlan.zhihu.com/p/657950165
+- https://zhuanlan.zhihu.com/p/636577476
+- https://segmentfault.com/a/1190000018002480
+
 
 ## 包管理
 
@@ -75,6 +93,21 @@ poetry config settings.virtualenvs.in-project true      # 设置在项目内创�
 [[tool.poetry.source]]
 name = "douban"
 url = "https://pypi.doubanio.com/simple/"
+```
+
+## fastapi
+```
+├── app
+│   ├── __init__.py
+│   ├── main.py
+│   ├── dependencies.py
+│   └── routers
+│   │   ├── __init__.py
+│   │   ├── items.py
+│   │   └── users.py
+│   └── internal
+│       ├── __init__.py
+│       └── admin.py
 ```
 
 ## 开发指南
