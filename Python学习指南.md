@@ -16,7 +16,7 @@
 - pytest
 - uvicorn
 - dotenv
-
+- poetry
 ```
 uvicorn = "^0.24.0.post1"
 websockets = "^12.0"
