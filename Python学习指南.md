@@ -93,7 +93,30 @@ streamlit>=1.24.0
 - https://www.ab62.cn/article/16062.html
 - https://python.langchain.com/docs/get_started/introduction
 - https://www.zhihu.com/people/cfyfuz/posts?page=5
+- https://zhuanlan.zhihu.com/p/635915080
+- https://zhuanlan.zhihu.com/p/650680702
+- http://www.taodudu.cc/news/show-2054869.html?action=onClick
 
+```
+gpt-4-1106-preview	    $0.01 / 1K tokens	$0.03 / 1K tokens
+gpt-4-1106-vision-preview	$0.01 / 1K tokens	$0.03 / 1K tokens
+gpt-4	                $0.03 / 1K tokens	$0.06 / 1K tokens
+gpt-4-32k	            $0.06 / 1K tokens	$0.12 / 1K tokens
+gpt-3.5-turbo-1106	    $0.0010 / 1K tokens	$0.0020 / 1K tokens
+gpt-3.5-turbo-instruct	$0.0015 / 1K tokens	$0.0020 / 1K tokens
+
+FastAI-4k	        0.007/1k tokens	0.007/1k tokens
+FastAI-16k	        0.015/1k tokens	0.015/1k tokens
+FastAI35(不稳定)	0.007/1k tokens	0.007/1k tokens
+FastAI-Plus-turbo	0.1/1k tokens	0.1/1k tokens
+FastAI-Vision	    0.1/1k tokens	0.1/1k tokens
+FastAI-Plus-8k	    0.22/1k tokens	0.22/1k tokens
+FastAI-Plus-32k	    0.85/1k tokens	0.85/1k tokens
+chatglm_pro(QPS 5)	0.02/1k tokens	0.02/1k tokens
+文心一言(QPS 5)	    0.02/1k tokens	0.02/1k tokens
+星火3(QPS 2)	    0.03/1k tokens	0.03/1k tokens
+通义千问(QPS 5)	    0.03/1k tokens	0.03/1k tokens
+```
 ![Alt text](images/image.png)
 
 ## 包管理
