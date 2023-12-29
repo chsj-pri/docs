@@ -3,7 +3,6 @@
 - requests
 - httpx
 - scrapy
-- wxPython
 - BeautifulSoup
 - NumPy
 - pandas
@@ -17,6 +16,7 @@
 - uvicorn
 - dotenv
 - poetry
+- 
 ```
 uvicorn = "^0.24.0.post1"
 websockets = "^12.0"
@@ -26,7 +26,35 @@ beautifulsoup4 = "^4.12.2"
 httpx = "^0.25.1"
 ```
 
-![Alt text](images/image.png)
+```
+moviepy==1.0.3
+numpy
+Pillow==10.0.0
+requests==2.31.0
+uvicorn==0.23.2
+fastapi==0.100.1
+sqlalchemy==2.0.19
+uvicorn==0.23.2
+tqdm==4.65.0
+python-dotenv==1.0.0
+python-multipart==0.0.6
+openai==0.27.8
+httpx==0.24.1
+retrying==1.3.4
+```
+
+```
+protobuf
+transformers==4.30.2
+cpm_kernels
+torch>=2.0
+gradio
+mdtex2html
+sentencepiece
+accelerate
+sse-starlette
+streamlit>=1.24.0
+```
 
 ## 参考
 
@@ -56,7 +84,13 @@ httpx = "^0.25.1"
 - https://zhuanlan.zhihu.com/p/657950165
 - https://zhuanlan.zhihu.com/p/636577476
 - https://segmentfault.com/a/1190000018002480
+- https://www.zhihu.com/question/572103308/answer/2799763353
+- https://github.com/chivalry02/TextCreateVideo
+- https://fastgpt.run/
+- https://openai.com/pricing#language-models
+- https://www.ab62.cn/article/16062.html
 
+![Alt text](images/image.png)
 
 ## 包管理
 

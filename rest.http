@@ -1,0 +1,45 @@
+###
+POST https://fastgpt.run/api/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer fastgpt-AIfRZBiHfP3ujGvfppaxbumSAoFY
+
+{
+    "stream": false,
+    "detail": false,
+    "messages": [
+        {
+            "content": "导演是谁",
+            "role": "user"
+        }
+    ]
+}
+
+# HTTP/1.1 200 OK
+# Date: Fri, 29 Dec 2023 04:16:50 GMT
+# Content-Type: application/json; charset=utf-8
+# Content-Length: 490
+# Connection: close
+# ETag: "b538pxcouu7v"
+# Vary: Accept-Encoding
+# Strict-Transport-Security: max-age=15724800; includeSubDomains
+
+# {
+#   "id": "",
+#   "model": "",
+#   "usage": {
+#     "prompt_tokens": 1,
+#     "completion_tokens": 1,
+#     "total_tokens": 1
+#   },
+#   "choices": [
+#     {
+#       "message": {
+#         "role": "assistant",
+#         "content": "这个问题没有具体的上下文，所以无法确定指的是哪个导演。导演是指电影、戏剧、电视剧等艺术作品的创作和指导者。不同的作品有不同的导演。一些著名的导演包括斯坦利·库布里克、昆汀·塔伦蒂诺、克里斯托弗·诺兰、张艺谋等。"
+#       },
+#       "finish_reason": "stop",
+#       "index": 0
+#     }
+#   ]
+# }
+
