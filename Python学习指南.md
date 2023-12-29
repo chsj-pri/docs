@@ -78,6 +78,8 @@ streamlit>=1.24.0
 - https://17yongai.com/
 - https://github.com/bleedline/aimoneyhunter
 - https://liaokong.gitbook.io/llm-kai-fa-jiao-cheng/#chain-lian
+- https://zhuanlan.zhihu.com/p/629185975
+- https://zhuanlan.zhihu.com/p/641384348
 - https://zhuanlan.zhihu.com/p/27400862
 - https://zhuanlan.zhihu.com/p/387078089
 - https://zhuanlan.zhihu.com/p/665396121
@@ -89,6 +91,8 @@ streamlit>=1.24.0
 - https://fastgpt.run/
 - https://openai.com/pricing#language-models
 - https://www.ab62.cn/article/16062.html
+- https://python.langchain.com/docs/get_started/introduction
+- https://www.zhihu.com/people/cfyfuz/posts?page=5
 
 ![Alt text](images/image.png)
 
