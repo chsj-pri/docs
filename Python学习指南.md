@@ -16,7 +16,11 @@
 - uvicorn
 - dotenv
 - poetry
-- 
+- chroma
+- weaviate.io
+- pinecone 
+- LangChain
+- LlamaIndex
 ```
 uvicorn = "^0.24.0.post1"
 websockets = "^12.0"
@@ -57,8 +61,8 @@ streamlit>=1.24.0
 ```
 
 ## 参考
-
 - https://docs.python.org/zh-cn/3/
+- https://www.liaoxuefeng.com/wiki/1016959663602400
 - https://www.numpy.org.cn/
 - https://www.pypandas.cn/
 - https://moviepy-cn.readthedocs.io/zh/latest/
@@ -96,6 +100,17 @@ streamlit>=1.24.0
 - https://zhuanlan.zhihu.com/p/635915080
 - https://zhuanlan.zhihu.com/p/650680702
 - http://www.taodudu.cc/news/show-2054869.html?action=onClick
+- https://zhuanlan.zhihu.com/p/674755232
+- https://baoyu.io/translations/openai/openai-prompt-engineering-guides
+- https://zhuanlan.zhihu.com/p/648127076
+- https://www.bilibili.com/video/BV1Ys411k7yQ/
+- https://mp.weixin.qq.com/s/93cM--oG8INpWxzuPAwVuQ
+- https://zhuanlan.zhihu.com/p/462745931
+
+http://www.java1234.com/
+www.book123.info
+https://blog.csdn.net/Gjiujiu/article/details/129435674
+
 
 ```
 gpt-4-1106-preview	    $0.01 / 1K tokens	$0.03 / 1K tokens
@@ -117,7 +132,19 @@ chatglm_pro(QPS 5)	0.02/1k tokens	0.02/1k tokens
 星火3(QPS 2)	    0.03/1k tokens	0.03/1k tokens
 通义千问(QPS 5)	    0.03/1k tokens	0.03/1k tokens
 ```
+
+
+
+
+
+
+
+
+
+
+
 ![Alt text](images/image.png)
+
 
 ## 包管理
 
