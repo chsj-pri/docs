@@ -1,0 +1,13 @@
+- https://blog.csdn.net/Yaoyao2024/article/details/132123525
+- https://www.zhihu.com/question/22544926/answer/3244978365
+- 
+- apt-get update
+- apt-get install python3
+- apt-get install python3-pip
+- which python3
+- ln -s /usr/bin/python3 /usr/bin/python
+- apt install nodejs
+- apt install npm
+- pip3 install fastapi uvicorn
+- pip3 install moviepy
+- apt install imagemagick
