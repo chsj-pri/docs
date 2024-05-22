@@ -1,41 +1,84 @@
+### 安装
 
+```bash
+npm install --save-dev @babel/core @babel/preset-env @babel/plugin-transform-runtime  @babel/preset-react @babel/plugin-proposal-decorators @babel/plugin-syntax-decorators rollup @rollup/plugin-babel @rollup/plugin-commonjs @rollup/plugin-node-resolve @rollup/plugin-alias rollup-plugin-less rollup-plugin-terser rollup-plugin-node-polyfills @rollup/plugin-replace @rollup/plugin-url rollup-plugin-peer-deps-external rollup-plugin-postcss rollup-plugin-postcss-modules
+```
 
+## babelrc
 
-npm install --save-dev @babel/core @babel/preset-env rollup @rollup/plugin-babel @rollup/plugin-commonjs @rollup/plugin-node-resolve
-
-// .babelrc
+```json
 {
-  "presets": [
-    ["@babel/preset-env", { "modules": false }]
-  ]
+  "presets": [["@babel/preset-env", { "modules": false }]]
 }
+```
 
+## rollup.config.js
 
-// rollup.config.js
-import babel from '@rollup/plugin-babel';
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
+```js
+const babel = require("@rollup/plugin-babel");
+const resolve = require("@rollup/plugin-node-resolve");
+const commonjs = require("@rollup/plugin-commonjs");
+const nodePolyfills = require("rollup-plugin-node-polyfills");
+const replace = require("@rollup/plugin-replace");
+const alias = require("@rollup/plugin-alias");
+const peerDepsExternal = require("rollup-plugin-peer-deps-external");
+const less = require("rollup-plugin-less");
+const postcss = require("rollup-plugin-postcss");
+const url = require("@rollup/plugin-url");
+const { terser } = require("rollup-plugin-terser");
+const execute = require("rollup-plugin-shell");
+const nodePath = require("path");
 
-export default {
-  input: 'src/index.js',
+const production = !process.env.ROLLUP_WATCH;
+
+module.exports = {
+  input: "main.js",
   output: {
-    file: 'dist/bundle.js',
-    format: 'umd',
-    name: 'YourPackageName',
+    file: "dist/bundle.js",
+    format: "umd",
+    name: "h5-form-editor",
   },
   plugins: [
-    babel({
-      babelHelpers: 'bundled', // 使用 'bundled' 以减小包的体积
-      exclude: 'node_modules/**',
+    execute({ commands: ["npm version patch --force"], hook: "buildStart" }),
+    replace({
+      "process.env.NODE_ENV": JSON.stringify("development"),
     }),
-    resolve(),
-    commonjs(),
+    nodePolyfills(),
+    resolve({
+      browser: true,
+      extensions: [".js", ".jsx", ".less", "css", ".json"],
+    }),
+    commonjs({
+      include: /node_modules/,
+    }),
+    babel({
+      babelHelpers: "bundled",
+      exclude: "node_modules/**",
+      babelrc: false,
+      plugins: [
+        ["@babel/plugin-proposal-decorators", { decoratorsBeforeExport: true }],
+      ],
+      presets: ["@babel/preset-env", "@babel/preset-react"],
+    }),
+    url({
+      include: ["**/*.png", "**/*.jpg", "**/*.gif", "**/*.svg"],
+    }),
+    postcss({ plugins: [] }),
+    peerDepsExternal({
+      packageJsonPath: nodePath.resolve(__dirname, "package.json"),
+    }),
+    production && terser(),
   ],
 };
+```
 
+## 打包
 
-rollup -c
+```bash
+rollup --bundleConfigAsCjs
 rollup -c packages/component-1/rollup.config.js
 
 npm login
 npm publish
+lerna exec npm publish --scope=emoji-board
+```
