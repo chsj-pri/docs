@@ -803,10 +803,614 @@ window.microApp.forceDispatch({name: 'jack'}, () => {
 
 ###### 主应用向子应用发送数据
 
+```js
+// 在<micro-app>元素所在的文件顶部添加polyfill(注释也要复制)
+
+/** @jsxRuntime classic */
+/** @jsx jsxCustomEvent */
+import jsxCustomEvent from '@micro-zoe/micro-app/polyfill/jsx-custom-event'
+
+<micro-app  name='my-app'
+  url='xx'
+  data={this.state.dataForChild} // data只接受对象类型，采用严格对比(===)，当传入新的data对象时会重新发送
+/>
+```
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+// 发送数据给子应用 my-app，setData第二个参数只接受对象类型
+microApp.setData('my-app', {type: '新的数据'})
+```
+
+```js
+// 第一次发送数据，记入缓存值 {name: 'jack'}，然后发送 
+microApp.setData('my-app', {name: 'jack'})
+
+// 第二次发送数据，将新旧值合并为 {name: 'jack', age: 20}，记入缓存值，然后发送 
+microApp.setData('my-app', {age: 20})
+
+// 第三次发送数据，新旧值合并为 {name: 'jack', age: 20}，与缓存值相同，不再发送
+microApp.setData('my-app', {age: 20})
+```
+
+```js
+microApp.setData('my-app', {city: 'HK'}, () => {
+  console.log('数据已经发送完成')
+})
+```
+
+```js
+// 主应用
+// 返回值会放入数组中传递给setData的回调函数
+microApp.setData('my-app', {city: 'HK'}, (res: any[]) => {
+  console.log(res) // ['返回值1', '返回值2']
+})
+
+// 子应用
+window.microApp.addDataListener((data) => {
+  console.log('来自主应用的数据', data)
+
+  return '返回值1'
+})
+
+window.microApp.addDataListener((data) => {
+  console.log('来自主应用的数据', data)
+
+  return '返回值2'
+})
+```
+
+```js
+// 强制发送数据，无论缓存中是否已经存在 name: 'jack' 的值
+microApp.forceSetData('my-app', {name: 'jack'}, () => {
+  console.log('数据已经发送完成')
+})
+```
+
 ###### 主应用获取来自子应用的数据
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+const childData = microApp.getData(appName) // 返回子应用的data数据
+```
+
+```js
+/** @jsxRuntime classic */
+/** @jsx jsxCustomEvent */
+import jsxCustomEvent from '@micro-zoe/micro-app/polyfill/jsx-custom-event'
+
+<micro-app
+  name='my-app'
+  url='xx'
+  // 数据在event.detail.data字段中，子应用每次发送数据都会触发datachange
+  onDataChange={(e) => console.log('来自子应用的数据：', e.detail.data)}
+/>
+```
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+/** * 绑定监听函数 * appName: 应用名称 * dataListener: 绑定函数 * autoTrigger: 在初次绑定监听函数时如果有缓存数据，是否需要主动触发一次，默认为false */
+microApp.addDataListener(appName: string, dataListener: (data: Object) => any, autoTrigger?: boolean)
+
+// 解绑监听指定子应用的函数
+microApp.removeDataListener(appName: string, dataListener: (data: Object) => any)
+
+// 清空所有监听指定子应用的函数
+microApp.clearDataListener(appName: string)
+```
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+// 监听函数
+function dataListener (data) {
+  console.log('来自子应用my-app的数据', data)
+}
+
+// 监听来自子应用my-app的数据
+microApp.addDataListener('my-app', dataListener)
+
+// 解绑监听my-app子应用的函数
+microApp.removeDataListener('my-app', dataListener)
+
+// 清空所有监听my-app子应用的函数
+microApp.clearDataListener('my-app')
+```
 
 ###### 清空数据
 
+- 配置项 - clear-data
+
+- 手动清空 - clearData
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+// 清空主应用发送给子应用 my-app 的数据
+microApp.clearData('my-app')
+```
+
+```js
+// 清空当前子应用发送给主应用的数据
+window.microApp.clearData()
+```
+
 ###### 全局数据通信
 
+```js
+import microApp from '@micro-zoe/micro-app'
+
+// setGlobalData只接受对象作为参数
+microApp.setGlobalData({type: '全局数据'})
+
+// setGlobalData只接受对象作为参数
+window.microApp.setGlobalData({type: '全局数据'})
+```
+
+```js
+// 第一次发送数据，记入缓存值 {name: 'jack'}，然后发送 
+microApp.setGlobalData({name: 'jack'})
+
+// 第二次发送数据，将新旧值合并为 {name: 'jack', age: 20}，记入缓存值，然后发送 
+microApp.setGlobalData({age: 20})
+
+// 第三次发送数据，新旧值合并为 {name: 'jack', age: 20}，与缓存值相同，不再发送
+microApp.setGlobalData({age: 20})
+
+// 第一次发送数据，记入缓存值 {name: 'jack'}，然后发送 
+window.microApp.setGlobalData({name: 'jack'})
+
+// 第二次发送数据，将新旧值合并为 {name: 'jack', age: 20}，记入缓存值，然后发送 
+window.microApp.setGlobalData({age: 20})
+
+// 第三次发送数据，新旧值合并为 {name: 'jack', age: 20}，与缓存值相同，不再发送
+window.microApp.setGlobalData({age: 20})
+```
+
+```js
+microApp.addGlobalDataListener((data) => {
+  console.log('全局数据', data)
+
+  return '返回值1'
+})
+
+microApp.addGlobalDataListener((data) => {
+  console.log('全局数据', data)
+
+  return '返回值2'
+})
+
+window.microApp.addGlobalDataListener((data) => {
+  console.log('全局数据', data)
+
+  return '返回值1'
+})
+
+window.microApp.addGlobalDataListener((data) => {
+  console.log('全局数据', data)
+
+  return '返回值2'
+})
+
+// 返回值会放入数组中传递给setGlobalData的回调函数
+microApp.setGlobalData({city: 'HK'}, (res: any[]) => {
+  console.log(res) // ['返回值1', '返回值2']
+})
+
+// 返回值会放入数组中传递给setGlobalData的回调函数
+window.microApp.setGlobalData({city: 'HK'}, (res: any[]) => {
+  console.log(res) // ['返回值1', '返回值2']
+})
+
+// 强制发送数据，无论缓存中是否已经存在 name: 'jack' 的值
+microApp.forceSetGlobalData({name: 'jack'}, () => {
+  console.log('数据已经发送完成')
+})
+
+// 强制发送数据，无论缓存中是否已经存在 name: 'jack' 的值
+window.microApp.forceSetGlobalData({name: 'jack'}, () => {
+  console.log('数据已经发送完成')
+})
+```
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+// 直接获取数据
+const globalData = microApp.getGlobalData() // 返回全局数据
+
+function dataListener (data) {
+  console.log('全局数据', data)
+}
+
+/** * 绑定监听函数 * dataListener: 绑定函数 * autoTrigger: 在初次绑定监听函数时如果有缓存数据，是否需要主动触发一次，默认为false */
+microApp.addGlobalDataListener(dataListener: (data: Object) => any, autoTrigger?: boolean)
+
+// 解绑监听函数
+microApp.removeGlobalDataListener(dataListener: (data: Object) => any)
+
+// 清空主应用绑定的所有全局数据监听函数
+microApp.clearGlobalDataListener()
+
+
+// 直接获取数据
+const globalData = window.microApp.getGlobalData() // 返回全局数据
+
+function dataListener (data) {
+  console.log('全局数据', data)
+}
+
+/**
+ * 绑定监听函数
+ * dataListener: 绑定函数
+ * autoTrigger: 在初次绑定监听函数时如果有缓存数据，是否需要主动触发一次，默认为false
+ */
+window.microApp.addGlobalDataListener(dataListener: (data: Object) => any, autoTrigger?: boolean)
+
+// 解绑监听函数
+window.microApp.removeGlobalDataListener(dataListener: (data: Object) => any)
+
+// 清空当前子应用绑定的所有全局数据监听函数
+window.microApp.clearGlobalDataListener()
+```
+
+```js
+// 清空全局数据
+import microApp from '@micro-zoe/micro-app'
+
+// 清空全局数据
+microApp.clearGlobalData()
+
+// 清空全局数据
+window.microApp.clearGlobalData()
+```
+
 ###### 关闭沙箱后的通信方式
+
+```js
+import { EventCenterForMicroApp } from '@micro-zoe/micro-app'
+
+// 注意：每个子应用根据appName单独分配一个通信对象
+window.eventCenterForAppxx = new EventCenterForMicroApp(appName)
+
+// 直接获取数据
+const data = window.eventCenterForAppxx.getData() // 返回data数据
+
+function dataListener (data) {
+  console.log('来自主应用的数据', data)
+}
+
+/**
+ * 绑定监听函数
+ * dataListener: 绑定函数
+ * autoTrigger: 在初次绑定监听函数时如果有缓存数据，是否需要主动触发一次，默认为false
+ */
+window.eventCenterForAppxx.addDataListener(dataListener: (data: Object) => any, autoTrigger?: boolean)
+
+// 解绑监听函数
+window.eventCenterForAppxx.removeDataListener(dataListener: (data: Object) => any)
+
+// 清空当前子应用的所有绑定函数(全局数据函数除外)
+window.eventCenterForAppxx.clearDataListener()
+
+// 子应用向主应用发送数据，只接受对象作为参数
+window.eventCenterForAppxx.dispatch({type: '子应用发送的数据'})
+```
+
+### 资源系统
+
+##### 资源路径自动补全
+
+##### publicPath
+
+```js
+// public-path.js
+// __MICRO_APP_ENVIRONMENT__和__MICRO_APP_PUBLIC_PATH__是由micro-app注入的全局变量
+if (window.__MICRO_APP_ENVIRONMENT__) {
+  // eslint-disable-next-line
+  __webpack_public_path__ = window.__MICRO_APP_PUBLIC_PATH__
+}
+
+// 在子应用入口文件的最顶部引入public-path.js
+// entry
+import './public-path'
+
+```
+
+##### 资源共享
+
+```js
+// 方式一、globalAssets
+// index.js
+import microApp from '@micro-zoe/micro-app'
+
+microApp.start({
+  globalAssets: {
+    js: ['js地址1', 'js地址2', ...], // js地址
+    css: ['css地址1', 'css地址2', ...], // css地址
+  }
+})
+
+// 方式二、global 属性
+<link rel="stylesheet" href="xx.css" global>
+<script src="xx.js" global></script>
+```
+
+##### 资源过滤
+
+```js
+// 方式一：excludeAssetFilter
+// index.js
+import microApp from '@micro-zoe/micro-app'
+
+microApp.start({
+  excludeAssetFilter (assetUrl) {
+    if (assetUrl === 'xxx') {
+      return true // 返回true则micro-app不会劫持处理当前文件
+    }
+    return false
+  }
+})
+
+// 方式二：配置 exclude 属性
+<link rel="stylesheet" href="xx.css" exclude>
+<script src="xx.js" exclude></script>
+<style exclude></style>
+
+```
+
+### 预加载
+
+```js
+microApp.preFetch(apps: app[] | () => app[], delay?: number)
+
+app: {
+  name: string, // 应用名称，必传
+  url: string, // 应用地址，必传
+  iframe: boolean, // 是否使用iframe沙箱，vite应用必传，其它应用可选
+  inline: boolean, // 是否使用内联模式运行js，可选
+  'disable-scopecss': boolean, // 是否关闭样式隔离，可选
+  'disable-sandbox': boolean, // 是否关闭沙盒，可选
+  level: number, // 预加载等级，可选（分为三个等级：1、2、3，1表示只加载资源，2表示加载并解析，3表示加载解析并渲染，默认为2）
+  'default-page': string, // 指定默认渲染的页面，level为3时才会生效，可选
+  'disable-patch-request': boolean, // 关闭子应用请求的自动补全功能，level为3时才会生效，可选
+}
+
+// delay 默认值：3000
+
+// 修改delay的默认值
+import microApp from '@micro-zoe/micro-app'
+microApp.start({
+  prefetchDelay: 5000, // 修改delay默认值为5000ms
+})
+
+// 修改level的默认值
+import microApp from '@micro-zoe/micro-app'
+microApp.start({
+  prefetchLevel: 1, // 修改level默认值为1
+})
+
+```
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+// 方式一：设置数组
+microApp.preFetch([
+  { name: 'my-app1', url: 'xxx' }, // 加载资源并解析
+  { name: 'my-app2', url: 'xxx', level: 1 }, // 只加载资源
+  { name: 'my-app3', url: 'xxx', level: 3 }, // 加载资源、解析并渲染
+  { name: 'my-app4', url: 'xxx', level: 3, 'default-page': '/page2' }, // 加载资源、解析并渲染子应用的page2页面
+])
+
+// 方式二：设置一个返回数组的函数
+microApp.preFetch(() => [
+  { name: 'my-app1', url: 'xxx' }, // 加载资源并解析
+  { name: 'my-app2', url: 'xxx', level: 1 }, // 只加载资源
+  { name: 'my-app3', url: 'xxx', level: 3 }, // 加载资源、解析并渲染
+  { name: 'my-app4', url: 'xxx', level: 3, 'default-page': '/page2' }, // 加载资源、解析并渲染子应用的page2页面
+])
+
+// 方式三：在start中设置预加载数组
+microApp.start({
+  preFetchApps: [
+    { name: 'my-app1', url: 'xxx' }, // 加载资源并解析
+    { name: 'my-app2', url: 'xxx', level: 1 }, // 只加载资源
+    { name: 'my-app3', url: 'xxx', level: 3 }, // 加载资源、解析并渲染
+    { name: 'my-app4', url: 'xxx', level: 3, 'default-page': '/page2' }, // 加载资源、解析并渲染子应用的page2页面
+  ],
+})
+
+// 方式四：在start中设置一个返回预加载数组的函数
+microApp.start({
+  preFetchApps: () => [
+    { name: 'my-app1', url: 'xxx' }, // 加载资源并解析
+    { name: 'my-app2', url: 'xxx', level: 1 }, // 只加载资源
+    { name: 'my-app3', url: 'xxx', level: 3 }, // 加载资源、解析并渲染
+    { name: 'my-app4', url: 'xxx', level: 3, 'default-page': '/page2' }, // 加载资源、解析并渲染子应用的page2页面
+  ],
+})
+
+// 设置延迟时间，5秒钟之后执行预加载
+microApp.preFetch([
+  { name: 'my-app1', url: 'xxx' }, // 加载资源并解析
+], 5000)
+```
+
+### 插件系统
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+microApp.start({
+  plugins: {
+    // 全局插件，作用于所有子应用的js文件
+    global?: Array<{
+      // 可选，强隔离的全局变量(默认情况下子应用无法找到的全局变量会兜底到主应用中，scopeProperties可以禁止这种情况)
+      scopeProperties?: string[],
+      // 可选，可以逃逸到外部的全局变量(escapeProperties中的变量会同时赋值到子应用和外部真实的window上)
+      escapeProperties?: string[],
+      // 可选，如果函数返回 `true` 则忽略 script 和 link 标签的创建
+      excludeChecker?: (url: string) => boolean      // 可选，如果函数返回 `true` ，则 micro-app 不会处理它，元素将原封不动进行渲染
+      ignoreChecker?: (url: string) => boolean      // 可选，传递给loader的配置项
+      options?: any,
+      // 必填，js处理函数，必须返回code值
+      loader?: (code: string, url: string, options: any, info: sourceScriptInfo) => code,
+      // 可选，html 处理函数，必须返回 code 值
+      processHtml?: (code: string, url: string, options: unknown) => code    }>
+
+    // 子应用插件
+    modules?: {
+      // appName为应用的名称，这些插件只会作用于指定的应用
+      [appName: string]: Array<{
+        // 可选，强隔离的全局变量(默认情况下子应用无法找到的全局变量会兜底到主应用中，scopeProperties可以禁止这种情况)
+        scopeProperties?: string[],
+        // 可选，可以逃逸到外部的全局变量(escapeProperties中的变量会同时赋值到子应用和外部真实的window上)
+        escapeProperties?: string[],
+        // 可选，如果函数返回 `true` 则忽略 script 和 link 标签的创建
+        excludeChecker?: (url: string) => boolean        // 可选，如果函数返回 `true` ，则 micro-app 不会处理它，元素将原封不动进行渲染
+        ignoreChecker?: (url: string) => boolean        // 可选，传递给loader的配置项
+        options?: any,
+        // 可选，js处理函数，必须返回code值
+        loader?: (code: string, url: string, options: any, info: sourceScriptInfo) => code,
+        // 可选，html 处理函数，必须返回 code 值
+        processHtml?: (code: string, url: string, options: unknown) => code      }>
+    }
+  }
+})
+```
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+microApp.start({
+  plugins: {
+    global: [
+      {
+        scopeProperties: ['key', 'key', ...], // 可选
+        escapeProperties: ['key', 'key', ...], // 可选
+        excludeChecker: (url) => ['/foo.js', '/bar.css'].some(item => url.includes(item)), // 可选
+        options: 配置项, // 可选
+        loader(code, url, options, info) { // 可选
+          console.log('全局插件')
+          return code        },
+        processHtml(code, url, options, info) { // 可选
+          console.log('每个子应用 HTML 都会传入')
+          return code        },
+      }
+    ],
+    modules: {
+      'appName1': [{
+        loader(code, url, options, info) {
+          if (url === 'xxx.js') {
+            code = code.replace('var abc =', 'window.abc =')
+          }
+          return code        }
+      }],
+      'appName2': [{
+        scopeProperties: ['key', 'key', ...], // 可选
+        escapeProperties: ['key', 'key', ...], // 可选
+        ignoreChecker: (url) => ['/foo.js', '/bar.css'].some(item => url.includes(item)), // 可选
+        options: 配置项, // 可选
+        loader(code, url, options, info) { // 可选
+          console.log('只适用于appName2的插件')
+          return code        },
+        processHtml(code, url, options, info) { // 可选
+          console.log('只适用于 appName2 的 HTML 处理')
+          return code        },
+      }]
+    }
+  }
+})
+```
+
+### 多层嵌套
+
+```js
+microApp.start({
+  tagName: 'micro-app-xxx', // 标签名称必须以 `micro-app-` 开头
+})
+
+<micro-app-xxx name='xx' url='xx'></micro-app-xxx>
+
+```
+
+### keep-alive
+
+```js
+<micro-app name='xx' url='xx' keep-alive></micro-app>
+```
+
+### 高级功能
+
+```js
+import microApp from '@micro-zoe/micro-app'
+
+microApp.start({
+  /**   
+  * 自定义fetch   
+  * @param {string} url 静态资源地址   
+  * @param {object} options fetch请求配置项   
+  * @param {string|null} appName 应用名称   * @returns Promise<string>  
+  */
+  fetch (url, options, appName) {
+    if (url === 'http://localhost:3001/error.js') {
+      // 删除 http://localhost:3001/error.js 的内容
+      return Promise.resolve('')
+    }
+        const config = {
+      // fetch 默认不带cookie，如果需要添加cookie需要配置credentials
+      credentials: 'include', // 请求时带上cookie
+    }
+
+    return window.fetch(url, Object.assign(options, config)).then((res) => {
+      return res.text()
+    })
+  }
+})
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

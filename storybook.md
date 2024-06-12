@@ -1,8 +1,10 @@
 ### 安装、启动
+
 - npx storybook@latest init
 - npm run storybook
 
 ### 介绍
+
 ```jsx
 import { Button } from "antd";
 
@@ -21,7 +23,9 @@ export const PrimaryOther = {
   },
 };
 ```
+
 ### 创建一个组件
+
 ```jsx
 export const Button = ({ primary, backgroundColor, size, label, ...props }) => {
   const mode = primary
@@ -39,15 +43,17 @@ export const Button = ({ primary, backgroundColor, size, label, ...props }) => {
     </button>
   );
 };
-
 ```
 
 ### 创建组件故事
+
 新建文件*.stories.js，如Button.stories.js
 
 ### 默认导出（Default export）
+
 默认导出元数据控制Storybook如何展示故事，
 component字段是必须的
+
 ```jsx
 import { Button } from './Button';
 export default {
@@ -56,6 +62,7 @@ export default {
 ```
 
 ### 定义故事
+
 ```jsx
 import { Button } from './Button';
 
@@ -69,6 +76,7 @@ export const Primary = {
 ```
 
 ### 使用React Hooks
+
 ```jsx
 import React, { useState } from 'react';
 
@@ -97,6 +105,7 @@ export const Primary = {
 ```
 
 ### 重命名故事
+
 ```jsx
 import { Button } from './Button';
 
@@ -111,7 +120,9 @@ export const Primary = {
 ```
 
 ### 如何编写故事
+
 一个故事是一个描述如何渲染组件的函数。可以为每个组件创建多个故事，最简单的方法是多次以不同参数渲染组件
+
 ```jsx
 import { Button } from './Button';
 
@@ -133,7 +144,9 @@ export const Tertiary = {
 ```
 
 ### 使用args
+
 通过使用args来优化组件的故事，可以减少您需要为每个故事编写和维护的样板代码。
+
 ```jsx
 import { Button } from './Button';
 
@@ -164,6 +177,7 @@ export const Tertiary = {
 ```
 
 ### 复用其他组件的args
+
 ```jsx
 import { ButtonGroup } from '../ButtonGroup';
 import * as ButtonStories from './Button.stories';
@@ -181,6 +195,7 @@ export const Pair = {
 ```
 
 ### 使用play函数
+
 storybook的play函数和@storybook/addon-interactions是便捷的辅助方法，用于测试需要用户干预的组件场景。
 例如，假设您想要验证一个表单组件，您可以使用play函数编写以下故事，以检查在填写输入信息时组件的响应方式：
 
@@ -212,8 +227,10 @@ export const FilledForm = {
 ```
 
 ### 使用参数（parameters）
+
 配置Storybook插件的参数
 例如配置backgrounds插件的参数
+
 ```jsx
 import { Button } from './Button';
 
@@ -231,9 +248,10 @@ export default {
 };
 ```
 
-
 ### 使用装饰器（decorators）
+
 如下示例，将对组件的每个故事填充3em的边距和红色背景
+
 ```jsx
 import { Button } from './Button';
 
@@ -250,7 +268,9 @@ export default {
 ```
 
 ### 为两个或更多组件编写故事
+
 在构建设计系统或组件库时，您可能会创建两个或更多组件以配合使用。例如，如果您有一个父级List组件，它可能需要子级的ListItem组件。
+
 ```jsx
 
 import React from 'react';
@@ -275,6 +295,7 @@ export const ManyItems = {
 ```
 
 ### 故事args
+
 args对象可以在故事、组件和全局级别定义
 如下代码定义单个故事的参数
 
@@ -301,8 +322,10 @@ export const PrimaryLongName = {
 ```
 
 ### 组件args
+
 还可以在组件级别定义args；
 将适用于组件的所有故事，除非覆盖它们
+
 ```jsx
 import { Button } from './Button';
 
@@ -318,8 +341,10 @@ export default {
 ```
 
 ### 全局args
+
 还可以在全局级别定义参数；
 将适用于每个组件的故事，除非覆盖它们
+
 ```jsx
 // .storybook/preview.js
 
@@ -329,8 +354,10 @@ export default {
 ```
 
 ### args组合
+
 可以将故事的参数分开，然后在其他故事中组合使用
 以下是如何将同一组件的多个故事的参数组合在一起的方法
+
 ```jsx
 import { Button } from './Button';
 
@@ -354,8 +381,10 @@ export const Secondary = {
 ```
 
 ### args 可以修改组件的任何方面
+
 可以在故事中使用 args 来配置组件的外观，类似于您在应用程序中所做的
 例如，以下是如何使用 footer 参数来填充子组件的示例：
+
 ```jsx
 import { Page } from './Page';
 
@@ -376,6 +405,7 @@ export const CustomFooter = {
 ```
 
 ### 在故事内部设置参数
+
 ```jsx
 import { useArgs } from '@storybook/preview-api';
 import { Checkbox } from './checkbox';
@@ -402,7 +432,9 @@ export const Example = {
 ```
 
 ### 映射到复杂的参数值
+
 复杂的值，比如JSX元素，不能被序列化到管理器（例如Controls插件）或与URL同步。参数值可以使用argTypes中的mapping属性从简单的字符串映射到复杂类型，以解决这个限制。它可以用于任何参数，但在使用选择控件类型时最有意义。
+
 ```jsx
 import { Example } from './Example';
 
@@ -421,6 +453,7 @@ export default {
 ```
 
 ### 故事parameters
+
 ```jsx
 import { Button } from './Button';
 
@@ -446,6 +479,7 @@ export const Primary = {
 ```
 
 ### 组件parameters
+
 ```jsx
 import { Button } from './Button';
 
@@ -464,6 +498,7 @@ export default {
 ```
 
 ### 全局parameters
+
 ```jsx
 // .storybook/preview.js
 
@@ -480,15 +515,17 @@ export default {
 ```
 
 ### parameters继承规则
+
 全局、组件和故事参数的组合方式如下：
+
 1. 更具体的参数优先（因此故事参数会覆盖组件参数，组件参数会覆盖全局参数）
 2. 参数会合并，因此键只会被覆盖，不会被删除
 3. 参数的合并很重要。这意味着可以在每个故事的基础上覆盖单个特定的子参数，但仍保留全局定义的大多数参数
 
-
-
 ### 使用额外的标签包装故事
+
 装饰器用于对故事进行“包裹”
+
 ```jsx
 import { YourComponent } from './YourComponent';
 
@@ -505,6 +542,7 @@ export default {
 ```
 
 ### Context模拟
+
 ```jsx
 // .storybook/preview.js
 
@@ -524,6 +562,7 @@ export default {
 ```
 
 ### 故事decorators
+
 ```jsx
 import { Button } from './Button';
 
@@ -543,6 +582,7 @@ export const Primary = {
 ```
 
 ### 组件decorators
+
 ```jsx
 import { Button } from './Button';
 
@@ -559,6 +599,7 @@ export default {
 ```
 
 ### 全局decorators
+
 ```jsx
 // .storybook/preview.jsx
 
@@ -576,11 +617,14 @@ export default {
 ```
 
 ### 装饰器decorators继承
+
 与parameters一样，装饰器可以在全局级别、组件级别和单个故事级别进行定义
 故事装饰器 > 组件装饰器 > 全局装饰器
 
 ### 使用Loader获取API数据
+
 从远程API调用获得的响应被合并到故事函数的第二个参数——story上下文的loaded字段中。
+
 ```jsx
 import fetch from 'node-fetch';
 import { TodoItem } from './TodoItem';
@@ -600,6 +644,7 @@ export const Primary = {
 ```
 
 ### 全局加载器Loader
+
 ```jsx
 // .storybook/preview.js
 
@@ -615,16 +660,23 @@ export default {
 ```
 
 ### 加载器（Loader）继承
+
 1. 与parameters一样，加载器可以在全局级别、组件级别和单个故事级别进行定义。
+
 2. 所有适用于故事的所有级别的加载器都在故事在Storybook的画布中渲染之前运行。
+
 3. 所有加载器并行运行
+
 4. 所有结果都存储在故事上下文的loaded字段中
+
 5. 如果存在重叠的键，"后来"的加载器优先级更高（从低到高）：
-> 全局加载器，按定义的顺序
-> 组件加载器，按定义的顺序
-> 故事加载器，按定义的顺序
+   
+   > 全局加载器，按定义的顺序
+   > 组件加载器，按定义的顺序
+   > 故事加载器，按定义的顺序
 
 ### 组件命名
+
 ```jsx
 import { Button } from './Button';
 export default {
@@ -634,6 +686,7 @@ export default {
 ```
 
 ### 组件分组
+
 ```jsx
 import { Button } from './Button';
 export default {
@@ -642,11 +695,13 @@ export default {
 };
 ```
 
-###  构建页面
+### 构建页面
+
 **纯呈现页面**
 **容器页面**
 
 ##### 使用参数组合的纯呈现页面
+
 ```jsx
 // YourPage.js|jsx
 import React from 'react';
@@ -662,6 +717,7 @@ export function DocumentScreen({ user, document, subdocuments }) {
   );
 }
 ```
+
 ```jsx
 // YourPage.stories.js|jsx
 import { DocumentScreen } from './YourPage';
@@ -682,12 +738,14 @@ export const Simple = {
 ```
 
 ##### 使用MSW模拟API请求的容器页面
+
 ```shell
 // 安装
 pnpm add --save-dev msw msw-storybook-addon
 // 初始化
 npx msw init public/
 ```
+
 ```jsx
 // .storybook/preview.js
 import { initialize, mswDecorator } from 'msw-storybook-addon';
@@ -706,6 +764,7 @@ export default {
   },
 };
 ```
+
 ```jsx
 // .storybook/main.js
 export default {
@@ -714,6 +773,7 @@ export default {
   staticDirs: ['../public'], // 配置静态文件夹
 };
 ```
+
 ```jsx
 // YourPage.js|jsx|mjs|ts|tsx
 import React, { useState, useEffect } from 'react';
@@ -764,6 +824,7 @@ export function DocumentScreen() {
   );
 }
 ```
+
 ```jsx
 // YourPage.stories.js|jsx
 import { rest } from 'msw';
@@ -819,6 +880,7 @@ export const MockedError = {
 ```
 
 ### 使用 children 作为参数
+
 ```jsx
 import { List } from './List';
 import { Unchecked } from './ListItem.stories';
@@ -835,6 +897,7 @@ export const OneItem = {
 ```
 
 ### 创建模板组件
+
 ```jsx
 import { List } from './List';
 import { ListItem } from './ListItem';
@@ -877,6 +940,7 @@ export const OneItem = {
 ```
 
 ### 设置自动生成的文档
+
 ```jsx
 // Button.stories.js
 import { Button } from './Button';
@@ -897,6 +961,7 @@ export const Primary = {
 ```
 
 ### 配置文档页面
+
 ```jsx
 // .storybook/main.js
 export default {
@@ -910,6 +975,7 @@ export default {
 ```
 
 ### 编写自定义文档模板
+
 ```jsx
 // .storybook/preview.jsx
 import { Title, Subtitle, Description, Primary, Controls, Stories } from '@storybook/blocks';
@@ -933,6 +999,7 @@ export default {
 ```
 
 ### 使用MDX
+
 ```markdown
 {/* DocumentationTemplate.mdx */}
 import { Meta, Title, Subtitle, Description, Primary, Controls, Stories } from '@storybook/blocks';
@@ -948,6 +1015,7 @@ The component accepts the following inputs (props):
 Listed below are additional variations of the component.
 <Stories />
 ```
+
 ```jsx
 // .storybook/preview.jsx
 import DocumentationTemplate from './DocumentationTemplate.mdx';
@@ -961,12 +1029,14 @@ export default {
 ```
 
 ### 发布Storybook
+
 ```shell
 npm run build-storybook
 npx http-server ./path/to/build
 ```
 
 ### action（配置argType）
+
 ```jsx
 // Button.stories.js|jsx
 import { Button } from './Button';
@@ -977,6 +1047,7 @@ export default {
 ```
 
 ### action（自动匹配args）
+
 ```jsx
 // .storybook/preview.js
 export default {
@@ -985,6 +1056,7 @@ export default {
   },
 };
 ```
+
 ```jsx
 // Button.stories.js|jsx
 
@@ -996,6 +1068,7 @@ export default {
 ```
 
 ### action（HTML事件处理器）
+
 ```jsx
 // Button.stories.js|jsx
 
@@ -1013,6 +1086,7 @@ export default {
 ```
 
 ### 选择控件类型
+
 ```jsx
 import { Button } from './Button';
 export default {
@@ -1033,6 +1107,7 @@ export const Primary = {
 ```
 
 ### 自定义控件类型匹配器
+
 ```jsx
 // .storybook/preview.js
 export default {
@@ -1048,6 +1123,7 @@ export default {
 ```
 
 ### 导入CSS文件
+
 ```jsx
 // .storybook/preview.js
 import '../src/styles/global.css';
@@ -1057,30 +1133,24 @@ export default {
 ```
 
 ### 参考
+
 https://storybook.js.org/docs/react/get-started/why-storybook
 https://storybook.js.org/docs/react/api/arg-types
 
-| Data Type   | Control        | Description                                                  |
-| :---------- | :------------- | :----------------------------------------------------------- |
-| **boolean** | `boolean`      | Provides a toggle for switching between possible states. `argTypes: { active: { control: 'boolean' }}` |
-| **number**  | `number`       | Provides a numeric input to include the range of all possible values. `argTypes: { even: { control: { type: 'number', min:1, max:30, step: 2 } }}` |
-|             | `range`        | Provides a range slider component to include all possible values. `argTypes: { odd: { control: { type: 'range', min: 1, max: 30, step: 3 } }}` |
-| **object**  | `object`       | Provides a JSON-based editor component to handle the object's values. Also allows edition in raw mode. `argTypes: { user: { control: 'object' }}` |
-| **array**   | `object`       | Provides a JSON-based editor component to handle the values of the array. Also allows edition in raw mode. `argTypes: { odd: { control: 'object' }}` |
-|             | `file`         | Provides a file input component that returns an array of URLs. Can be further customized to accept specific file types. `argTypes: { avatar: { control: { type: 'file', accept: '.png' } }}` |
-| **enum**    | `radio`        | Provides a set of radio buttons based on the available options. `argTypes: { contact: { control: 'radio', options: ['email', 'phone', 'mail'] }}` |
-|             | `inline-radio` | Provides a set of inlined radio buttons based on the available options. `argTypes: { contact: { control: 'inline-radio', options: ['email', 'phone', 'mail'] }}` |
-|             | `check`        | Provides a set of checkbox components for selecting multiple options. `argTypes: { contact: { control: 'check', options: ['email', 'phone', 'mail'] }}` |
-|             | `inline-check` | Provides a set of inlined checkbox components for selecting multiple options. `argTypes: { contact: { control: 'inline-check', options: ['email', 'phone', 'mail'] }}` |
-|             | `select`       | Provides a drop-down list component to handle single value selection. `argTypes: { age: { control: 'select', options: [20, 30, 40, 50] }}` |
-|             | `multi-select` | Provides a drop-down list that allows multiple selected values. `argTypes: { countries: { control: 'multi-select', options: ['USA', 'Canada', 'Mexico'] }}` |
-| **string**  | `text`         | Provides a freeform text input. `argTypes: { label: { control: 'text' }}` |
+| Data Type   | Control        | Description                                                                                                                                                                                                     |
+|:----------- |:-------------- |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **boolean** | `boolean`      | Provides a toggle for switching between possible states. `argTypes: { active: { control: 'boolean' }}`                                                                                                          |
+| **number**  | `number`       | Provides a numeric input to include the range of all possible values. `argTypes: { even: { control: { type: 'number', min:1, max:30, step: 2 } }}`                                                              |
+|             | `range`        | Provides a range slider component to include all possible values. `argTypes: { odd: { control: { type: 'range', min: 1, max: 30, step: 3 } }}`                                                                  |
+| **object**  | `object`       | Provides a JSON-based editor component to handle the object's values. Also allows edition in raw mode. `argTypes: { user: { control: 'object' }}`                                                               |
+| **array**   | `object`       | Provides a JSON-based editor component to handle the values of the array. Also allows edition in raw mode. `argTypes: { odd: { control: 'object' }}`                                                            |
+|             | `file`         | Provides a file input component that returns an array of URLs. Can be further customized to accept specific file types. `argTypes: { avatar: { control: { type: 'file', accept: '.png' } }}`                    |
+| **enum**    | `radio`        | Provides a set of radio buttons based on the available options. `argTypes: { contact: { control: 'radio', options: ['email', 'phone', 'mail'] }}`                                                               |
+|             | `inline-radio` | Provides a set of inlined radio buttons based on the available options. `argTypes: { contact: { control: 'inline-radio', options: ['email', 'phone', 'mail'] }}`                                                |
+|             | `check`        | Provides a set of checkbox components for selecting multiple options. `argTypes: { contact: { control: 'check', options: ['email', 'phone', 'mail'] }}`                                                         |
+|             | `inline-check` | Provides a set of inlined checkbox components for selecting multiple options. `argTypes: { contact: { control: 'inline-check', options: ['email', 'phone', 'mail'] }}`                                          |
+|             | `select`       | Provides a drop-down list component to handle single value selection. `argTypes: { age: { control: 'select', options: [20, 30, 40, 50] }}`                                                                      |
+|             | `multi-select` | Provides a drop-down list that allows multiple selected values. `argTypes: { countries: { control: 'multi-select', options: ['USA', 'Canada', 'Mexico'] }}`                                                     |
+| **string**  | `text`         | Provides a freeform text input. `argTypes: { label: { control: 'text' }}`                                                                                                                                       |
 |             | `color`        | Provides a color picker component to handle color values. Can be additionally configured to include a set of color presets. `argTypes: { color: { control: { type: 'color', presetColors: ['red', 'green']} }}` |
-|             | `date`         | Provides a datepicker component to handle date selection. `argTypes: { startDate: { control: 'date' }}` |
-
-
-
-
-
-
-
+|             | `date`         | Provides a datepicker component to handle date selection. `argTypes: { startDate: { control: 'date' }}`                                                                                                         |

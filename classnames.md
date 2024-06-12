@@ -167,3 +167,74 @@ export default function SubmitButton({ store, form }) {
   return <button className={className}>{text}</button>;
 }
 ```
+
+### 支持的主要数据类型：
+
+##### 字符串 (String)
+
+- 生成的类名字符串中会包含这些字符串
+
+```js
+const className = classNames('class1', 'class2');
+console.log(className); // 'class1 class2'
+```
+
+##### 对象 (Object)
+
+- 对象的键是类名，值是布尔值，值为 `true` 的键会被包含在生成的类名字符串中
+
+```js
+const isActive = true;
+const className = classNames({
+  'class1': true,
+  'class2': isActive,
+  'class3': !isActive,
+});
+console.log(className); // 'class1 class2'
+```
+
+##### 数组 (Array)
+
+- 数组中的每个元素都可以是字符串、对象，甚至是嵌套数组。数组中的有效类名会被包含在生成的类名字符串中
+
+```js
+const className = classNames(['class1', 'class2', { 'class3': true }, ['class4', { 'class5': false }]]);
+console.log(className); // 'class1 class2 class3 class4'
+```
+
+##### 混合类型 (Mixed Types)
+
+- 可以传递任意组合的字符串、对象和数组
+
+```js
+const isActive = true;
+const className = classNames(
+  'class1',
+  { 'class2': isActive, 'class3': !isActive },
+  ['class4', { 'class5': true }],
+  'class6'
+);
+console.log(className); // 'class1 class2 class4 class5 class6'
+```
+
+##### Null 和 Undefined
+
+- `null` 和 `undefined` 会被自动忽略，不会包含在生成的类名字符串中
+
+```js
+const className = classNames('class1', null, undefined, 'class2');
+console.log(className); // 'class1 class2'
+```
+
+### 总结
+
+`classnames` 函数可以接受以下数据类型的参数：
+
+- **字符串** (String)
+- **对象** (Object)
+- **数组** (Array)
+- **null 和 undefined** (将被忽略)
+
+
+
+
